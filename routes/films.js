@@ -1,12 +1,10 @@
 var express = require('express');
 var router = express.Router();
 
-router.get('/', function (req, res) {
-  res.send('List all films, group by director');
-})
+var films_controller = require('../controllers/filmsController')
 
-router.get('/:filmSwapiId/characters', function (req, res) {
-  res.send(req.params);
-})
+router.get('/', films_controller.index)
+
+router.get('/:filmSwapiId/characters', films_controller.characters)
 
 module.exports = router;
