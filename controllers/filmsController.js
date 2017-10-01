@@ -1,11 +1,16 @@
 const swapi = require('swapi-node');
+const filmsService = require('../services/filmsService');
 
-// TODO filter out only the data we need 
-// TODO groupBy directors
 // TODO error handling 
 exports.index = function(req, res) {
   swapi.getFilm().then((result) => {
-    res.send(result);
+    const filteredResults = filmsService.filterFilmAttributes(result);
+    const groupedResults = filmsService.groupFilmsBy(
+      req.query.group_by,
+      filteredResults
+    );
+
+    res.send(groupedResults);
   });
 };
 
