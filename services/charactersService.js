@@ -6,23 +6,18 @@ function extractSwapiId(url) {
 }
 
 function getAllCharactersFromSwapi(characterIds, resolve) {
-  Promise.all(characterIds.map((id) => {
-
-    return swapi.getPerson(id).then((result) => {
-      return result.name;
-    });
-  })).then(results => resolve(results));
+  Promise.all(characterIds.map(id => swapi.getPerson(id)
+    .then(result => result.name)))
+    .then(results => resolve(results));
 }
 
 module.exports = {
-  listCharacters: (filmSwapiId) => {
-    return new Promise((resolve, reject) => {
-      swapi.getFilm(filmSwapiId).then((result) => {
-        const characterIds = result.characters.map(extractSwapiId);
-        getAllCharactersFromSwapi(characterIds, resolve);
-      }).catch((err) => {
-        reject(err);
-      });
+  listCharacters: filmSwapiId => new Promise((resolve, reject) => {
+    swapi.getFilm(filmSwapiId).then((result) => {
+      const characterIds = result.characters.map(extractSwapiId);
+      getAllCharactersFromSwapi(characterIds, resolve);
+    }).catch((err) => {
+      reject(err);
     });
-  }
+  }),
 };
