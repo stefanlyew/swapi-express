@@ -1,39 +1,39 @@
 const _ = require('underscore');
 const swapi = require('swapi-node');
 
-module.exports = (function () {
+module.exports = (function filmsService() {
+  function extractSwapiId(url) {
+    const matches = url.match(/films\/(.*)\//);
+    return matches[1];
+  }
+
+  function filteredAttributes(film) {
     return {
-      listFilms: (groupBy) => {
-        return new Promise(function(resolve, reject) {
-          swapi.getFilm().then((result) => {
-            const filteredResults = result["results"].map(_filteredAttributes);
-            const groupedResults = _groupFilmsBy(groupBy, filteredResults);
-            resolve(groupedResults);
-          }).catch((err) => {
-            reject(err);
-          });
-        });
-      },
+      director: film.director,
+      title: film.title,
+      swapi_id: extractSwapiId(film.url),
     };
+  }
 
-    function _filteredAttributes(film) {
-        return {
-          director: film["director"],
-          title: film["title"],
-          swapi_id: _extractSwapiId(film["url"]),
-        };
+  function groupFilmsBy(groupBy, films) {
+    if (groupBy === 'director') {
+      return _.groupBy(films, 'director');
     }
 
-    function _groupFilmsBy(groupBy, films) {
-      if (groupBy == "director") {
-        return _.groupBy(films, "director");
-      } else {
-        return films;
-      }
-    }
+    return films;
+  }
 
-    function _extractSwapiId(url) {
-      const matches = url.match(/films\/(.*)\//);
-      return matches[1];
-    }
+  return {
+    listFilms: (groupBy) => {
+      return new Promise((resolve, reject) => {
+        swapi.getFilm().then((result) => {
+          const filteredResults = result.results.map(filteredAttributes);
+          const groupedResults = groupFilmsBy(groupBy, filteredResults);
+          resolve(groupedResults);
+        }).catch((err) => {
+          reject(err);
+        });
+      });
+    },
+  };
 }());
