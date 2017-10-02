@@ -1,3 +1,4 @@
+const charactersService = require('../services/charactersService');
 const filmsService = require('../services/filmsService');
 
 // TODO error handling 
@@ -8,6 +9,8 @@ module.exports = {
     });
   },
   characters: (req, res) => {
-      res.send('NOT IMPLEMENTED: List Characters for the film with id: ' + req.params.filmSwapiId);
+    charactersService.listCharacters(req.params.filmSwapiId).then((films) => {
+      res.send(films);
+    });
   }
 }
