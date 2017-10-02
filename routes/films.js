@@ -1,10 +1,9 @@
-var express = require('express');
-var router = express.Router();
+const express = require('express');
+const filmsController = require('../controllers/filmsController');
 
-var films_controller = require('../controllers/filmsController')
+const router = express.Router();
 
-router.get('/', films_controller.index)
-
-router.get('/:filmSwapiId/characters', films_controller.characters)
+router.get('/', filmsController.index);
+router.get('/:filmSwapiId/characters', filmsController.characters);
 
 module.exports = router;
