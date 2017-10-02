@@ -1,32 +1,29 @@
-const _ = require('underscore');
 const swapi = require('swapi-node');
 
-module.exports = (function () {
-    return {
-      listCharacters: (filmSwapiId) => {
-        return new Promise(function(resolve, reject) {
-          swapi.getFilm(filmSwapiId).then((result) => {
-            const characterIds = result["characters"].map(_extractSwapiId);
-            _getAllCharactersFromSwapi(characterIds, resolve);
-          }).catch((err) => {
-            reject(err);
-          });
-        });
-      },
-    };
+module.exports = (function charactersService() {
+  function extractSwapiId(url) {
+    const matches = url.match(/people\/(.*)\//);
+    return matches[1];
+  }
 
-    function _getAllCharactersFromSwapi(characterIds, resolve) {
-      Promise.all(characterIds.map((id) => {
-          return swapi.getPerson(id).then(function(result) {
-              return result["name"];
-          });
-      })).then(function(results) {
-        resolve(results);
+  function getAllCharactersFromSwapi(characterIds, resolve) {
+    Promise.all(characterIds.map((id) => {
+      return swapi.getPerson(id).then((result) => {
+        return result.name;
       });
-    }
+    })).then(results => resolve(results));
+  }
 
-    function _extractSwapiId(url) {
-      const matches = url.match(/people\/(.*)\//);
-      return matches[1];
-    }
+  return {
+    listCharacters: (filmSwapiId) => {
+      return new Promise((resolve, reject) => {
+        swapi.getFilm(filmSwapiId).then((result) => {
+          const characterIds = result.characters.map(extractSwapiId);
+          getAllCharactersFromSwapi(characterIds, resolve);
+        }).catch((err) => {
+          reject(err);
+        });
+      });
+    },
+  };
 }());
