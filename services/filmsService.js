@@ -6,7 +6,7 @@ module.exports = (function () {
       listFilms: (groupBy) => {
         return new Promise(function(resolve, reject) {
           swapi.getFilm().then((result) => {
-            const filteredResults = _filterFilmAttributes(result);
+            const filteredResults = result["results"].map(_filteredAttributes);
             const groupedResults = _groupFilmsBy(groupBy, filteredResults);
             resolve(groupedResults);
           }).catch((err) => {
@@ -16,14 +16,12 @@ module.exports = (function () {
       },
     };
 
-    function _filterFilmAttributes(result) {
-      return _.map(result["results"], function(film) {
+    function _filteredAttributes(film) {
         return {
           director: film["director"],
           title: film["title"],
           swapi_id: _extractSwapiId(film["url"]),
         };
-      });
     }
 
     function _groupFilmsBy(groupBy, films) {
